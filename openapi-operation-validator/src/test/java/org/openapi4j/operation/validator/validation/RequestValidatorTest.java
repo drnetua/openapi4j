@@ -5,6 +5,7 @@ import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.core.validation.ValidationException;
 import org.openapi4j.operation.validator.model.Request;
 import org.openapi4j.operation.validator.model.Response;
+import org.openapi4j.operation.validator.model.impl.Body;
 import org.openapi4j.operation.validator.model.impl.DefaultRequest;
 import org.openapi4j.operation.validator.model.impl.DefaultResponse;
 import org.openapi4j.parser.OpenApi3Parser;
@@ -14,10 +15,9 @@ import org.openapi4j.parser.model.v3.Path;
 
 import java.net.URL;
 
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertNotNull;
-import static org.openapi4j.operation.validator.model.Request.Method.GET;
-import static org.openapi4j.operation.validator.model.Request.Method.POST;
+import static org.junit.Assert.fail;
+import static org.openapi4j.operation.validator.model.Request.Method.*;
 
 public class RequestValidatorTest {
   @Test(expected = ValidationException.class)
@@ -159,6 +159,18 @@ public class RequestValidatorTest {
       requestValidator,
       new DefaultResponse.Builder(200).header("Content-Type", "application/json").header("X-Rate-Limit", "1").build(),
       true);
+  }
+
+  @Test
+  public void dashedParameterTest() throws ResolutionException, ValidationException {
+    URL specPath = RequestValidatorTest.class.getResource("/request/requestValidator-with-dashed-param.yaml");
+    OpenApi3 api = new OpenApi3Parser().parse(specPath, false);
+    RequestValidator requestValidator = new RequestValidator(api);
+    Request rq = new DefaultRequest.Builder("https://api.com/some/first/path/second/then/third/update", PUT)
+      .header("Content-Type", "application/json")
+      .body(Body.from("{}"))
+      .build();
+    requestValidator.validate(rq);
   }
 
   private void checkValidator(OpenApi3 api, String opId, RequestValidator requestValidator, Request rq, boolean shouldBeValid) {

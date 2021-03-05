@@ -109,20 +109,20 @@ public final class ParameterConverter {
     for (Map.Entry<String, AbsParameter<Parameter>> paramEntry : specParameters.entrySet()) {
       final String paramName = paramEntry.getKey();
       final AbsParameter<Parameter> param = paramEntry.getValue();
+      String groupName = paramName.replaceAll("[_-]", "x");
       final JsonNode convertedValue;
 
       if (param.getSchema() != null) {
         final String style = param.getStyle();
-
         if (LABEL.equals(style)) {
-          convertedValue = LabelStyleConverter.instance().convert(context, param, paramName, matcher.group(paramName));
+          convertedValue = LabelStyleConverter.instance().convert(context, param, paramName, matcher.group(groupName));
         } else if (MATRIX.equals(style)) {
-          convertedValue = MatrixStyleConverter.instance().convert(context, param, paramName, matcher.group(paramName));
+          convertedValue = MatrixStyleConverter.instance().convert(context, param, paramName, matcher.group(groupName));
         } else { // simple is the default
-          convertedValue = SimpleStyleConverter.instance().convert(context, param, paramName, matcher.group(paramName));
+          convertedValue = SimpleStyleConverter.instance().convert(context, param, paramName, matcher.group(groupName));
         }
       } else {
-        convertedValue = getValueFromContentType(context, param.getContentMediaTypes(), matcher.group(paramName));
+        convertedValue = getValueFromContentType(context, param.getContentMediaTypes(), matcher.group(groupName));
       }
 
       mappedValues.put(paramName, convertedValue);

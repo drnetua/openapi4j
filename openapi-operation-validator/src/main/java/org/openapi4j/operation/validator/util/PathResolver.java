@@ -67,7 +67,7 @@ public class PathResolver {
       lastMatchEnd = parametersMatcher.end();
 
       final String paramName = parametersMatcher.group(1);
-      addVariableFragment(regex, paramName);
+      addVariableFragment(regex, paramName.replaceAll("[_-]", "x"));
       foundParameter = true;
     }
 
